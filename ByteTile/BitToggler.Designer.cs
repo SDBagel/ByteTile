@@ -38,6 +38,8 @@
             this.Name = "BitToggler";
             this.Size = new System.Drawing.Size(40, 40);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BitToggler_MouseDown);
+            this.MouseEnter += new System.EventHandler(this.BitToggler_MouseEnter);
+            this.MouseLeave += new System.EventHandler(this.BitToggler_MouseLeave);
             this.ResumeLayout(false);
 
         }

@@ -23,7 +23,7 @@ namespace ByteTile
 
         private void BitToggler_MouseDown(object sender, MouseEventArgs e)
         {
-            if (BackColor.Equals(Color.Black))
+            if (isToggled)
             {
                 BackColor = Color.White;
                 isToggled = false;
@@ -33,7 +33,23 @@ namespace ByteTile
                 BackColor = Color.Black;
                 isToggled = true;
             }
-                
+            BitToggler_MouseEnter(sender, e);   
+        }
+
+        private void BitToggler_MouseEnter(object sender, EventArgs e)
+        {
+            if (isToggled)
+                BackColor = Color.FromArgb(60, 60, 60);
+            else
+                BackColor = Color.LightGray;
+        }
+
+        private void BitToggler_MouseLeave(object sender, EventArgs e)
+        {
+            if (isToggled)
+                BackColor = Color.Black;
+            else
+                BackColor = Color.White;
         }
     }
 }
