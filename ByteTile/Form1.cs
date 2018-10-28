@@ -81,14 +81,14 @@ namespace ByteTile
             richTextBox1.Text = "";
 
             List<BitToggler> bts = GetBitTogglers();
+            List<string> vals = new List<string>(512);
             for (int r = 0; r < rows; r += 8)
             {
-                List<string> vals = new List<string>(64);
                 for (int i = 0; i < columns; i++)
                 {
                     List<BitToggler> colBT = new List<BitToggler>();
                     colBT.AddRange(from bt in bts
-                                   where bt.column == i && bt.row <= r+7
+                                   where bt.column == i && bt.row <= r+7 && bt.row >= r
                                    select bt);
                     colBT.Reverse();
                     string binary = "";
@@ -110,6 +110,7 @@ namespace ByteTile
                 }
                 richTextBox1.Text = richTextBox1.Text.Substring(0, richTextBox1.Text.Length - 2);
                 richTextBox1.Text += "} \n";
+                vals.Clear();
             }
         }
 
