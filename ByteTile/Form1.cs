@@ -12,6 +12,9 @@ namespace ByteTile
 {
     public partial class Form1 : Form
     {
+        private int rows;
+        private int columns;
+
         public Form1()
         {
             InitializeComponent();
@@ -28,16 +31,18 @@ namespace ByteTile
                         row = y,
                         column = x
                     };
-                    newToggler.Location = new Point(20+x*45, 20+y*45);
-                    Controls.Add(newToggler);
+                    newToggler.Location = new Point(x*42, y*42);
+                    panel1.Controls.Add(newToggler);
                 }
             }
+            rows = 8;
+            columns = 8;
         }
         
         private List<BitToggler> GetBitTogglers()
         {
             List<BitToggler> bitTogglers = new List<BitToggler>();
-            foreach (Control control in Controls)
+            foreach (Control control in panel1.Controls)
             {
                 if (control.GetType().Equals(typeof(BitToggler)))
                 {
@@ -75,32 +80,79 @@ namespace ByteTile
         {
             richTextBox1.Text = "";
 
-            List<int> vals = new List<int>();
-
             List<BitToggler> bts = GetBitTogglers();
-            for (int i = 0; i < 8; i++)
+            for (int r = 0; r < rows; r += 8)
             {
-                List<BitToggler> colBT = new List<BitToggler>();
-                colBT.AddRange(from bt in bts
-                               where bt.column == i
-                               select bt);
-
-                string binary = "";
-                foreach (BitToggler bt in colBT)
+                List<string> vals = new List<string>(64);
+                for (int i = 0; i < columns; i++)
                 {
-                    if (bt.isToggled)
-                        binary += "1";
-                    else
-                        binary += "0";
+                    List<BitToggler> colBT = new List<BitToggler>();
+                    colBT.AddRange(from bt in bts
+                                   where bt.column == i && bt.row <= r+7
+                                   select bt);
+                    colBT.Reverse();
+                    string binary = "";
+                    foreach (BitToggler bt in colBT)
+                    {
+                        if (bt.isToggled)
+                            binary += "1";
+                        else
+                            binary += "0";
+                    }
+                    Console.WriteLine(binary);
+                    vals.Add(Convert.ToInt64(binary, 2).ToString());
                 }
-                
-                vals.Add(Convert.ToInt32(binary, 2));
+
+                richTextBox1.Text += "{";
+                foreach (string val in vals)
+                {
+                    richTextBox1.Text += $"{val}, ";
+                }
+                richTextBox1.Text = richTextBox1.Text.Substring(0, richTextBox1.Text.Length - 2);
+                richTextBox1.Text += "} \n";
             }
-            vals.Reverse();
-            foreach(int val in vals)
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            panel1.Controls.Clear();
+
+            for (int x = 0; x < numericUpDown1.Value; x++)
             {
-                richTextBox1.Text += $"{val.ToString()}, ";
+                for (int y = 0; y < numericUpDown2.Value; y++)
+                {
+                    var newToggler = new BitToggler
+                    {
+                        row = y,
+                        column = x
+                    };
+
+                    int xmod = (int)numericUpDown1.Value / 8;
+                    int ymod = (int)numericUpDown2.Value / 8;
+                    
+                    if (xmod > ymod)
+                    {
+                        newToggler.Location = new Point((x * newToggler.Size.Width) / xmod,
+                                                        (y * newToggler.Size.Width) / xmod);
+
+                        newToggler.Size = new Size(newToggler.Size.Width / xmod,
+                                                   newToggler.Size.Width / xmod);
+                    }
+                    else
+                    {
+                        newToggler.Location = new Point((x * newToggler.Size.Width) / ymod,
+                                                        (y * newToggler.Size.Width) / ymod);
+
+                        newToggler.Size = new Size(newToggler.Size.Width / ymod,
+                                                   newToggler.Size.Width / ymod);
+                    }
+
+                    panel1.Controls.Add(newToggler);
+                }
             }
+
+            columns = (int)numericUpDown1.Value;
+            rows = (int)numericUpDown2.Value;
         }
     }
 }

@@ -36,7 +36,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.Name = "BitToggler";
-            this.Size = new System.Drawing.Size(40, 40);
+            this.Size = new System.Drawing.Size(42, 42);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BitToggler_MouseDown);
             this.MouseEnter += new System.EventHandler(this.BitToggler_MouseEnter);
             this.MouseLeave += new System.EventHandler(this.BitToggler_MouseLeave);
