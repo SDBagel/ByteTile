@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ByteTile
 {
-    public partial class Form1 : Form
+    public partial class Window : Form
     {
         private int rows;
         private int columns;
 
-        public Form1()
+        public Window()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Window_Load(object sender, EventArgs e)
         {
             for (int x = 0; x < 8; x++)
             {
@@ -31,8 +28,8 @@ namespace ByteTile
                         row = y,
                         column = x
                     };
-                    newToggler.Location = new Point(x*42, y*42);
-                    panel1.Controls.Add(newToggler);
+                    newToggler.Location = new Point(x * 42, y * 42);
+                    Panel_Editor.Controls.Add(newToggler);
                 }
             }
             rows = 8;
@@ -42,7 +39,7 @@ namespace ByteTile
         private List<BitToggler> GetBitTogglers()
         {
             List<BitToggler> bitTogglers = new List<BitToggler>();
-            foreach (Control control in panel1.Controls)
+            foreach (Control control in Panel_Editor.Controls)
             {
                 if (control.GetType().Equals(typeof(BitToggler)))
                 {
@@ -52,7 +49,7 @@ namespace ByteTile
             return bitTogglers;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ResetGrid_Click(object sender, EventArgs e)
         {
             List<BitToggler> bts = GetBitTogglers();
             foreach (BitToggler bt in bts)
@@ -62,7 +59,7 @@ namespace ByteTile
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void InvertGrid_Click(object sender, EventArgs e)
         {
             List<BitToggler> bts = GetBitTogglers();
             foreach (BitToggler bt in bts)
@@ -76,9 +73,9 @@ namespace ByteTile
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void GenerateCode_Click(object sender, EventArgs e)
         {
-            richTextBox1.Text = "";
+            Output.Text = "";
 
             List<BitToggler> bts = GetBitTogglers();
             List<string> vals = new List<string>(512);
@@ -103,24 +100,24 @@ namespace ByteTile
                     vals.Add(Convert.ToInt64(binary, 2).ToString());
                 }
 
-                richTextBox1.Text += "{";
+                Output.Text += $"uint8_t row{r/8} = "+"{";
                 foreach (string val in vals)
                 {
-                    richTextBox1.Text += $"{val}, ";
+                    Output.Text += $"{val}, ";
                 }
-                richTextBox1.Text = richTextBox1.Text.Substring(0, richTextBox1.Text.Length - 2);
-                richTextBox1.Text += "} \n";
+                Output.Text = Output.Text.Substring(0, Output.Text.Length - 2);
+                Output.Text += "}; \n";
                 vals.Clear();
             }
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void GenerateGrid_Click(object sender, EventArgs e)
         {
-            panel1.Controls.Clear();
+            Panel_Editor.Controls.Clear();
 
-            for (int x = 0; x < numericUpDown1.Value; x++)
+            for (int x = 0; x < UpDown_GridX.Value; x++)
             {
-                for (int y = 0; y < numericUpDown2.Value; y++)
+                for (int y = 0; y < UpDown_GridY.Value; y++)
                 {
                     var newToggler = new BitToggler
                     {
@@ -128,9 +125,9 @@ namespace ByteTile
                         column = x
                     };
 
-                    int xmod = (int)numericUpDown1.Value / 8;
-                    int ymod = (int)numericUpDown2.Value / 8;
-                    
+                    int xmod = (int)UpDown_GridX.Value / 8;
+                    int ymod = (int)UpDown_GridY.Value / 8;
+
                     if (xmod > ymod)
                     {
                         newToggler.Location = new Point((x * newToggler.Size.Width) / xmod,
@@ -148,12 +145,12 @@ namespace ByteTile
                                                    newToggler.Size.Width / ymod);
                     }
 
-                    panel1.Controls.Add(newToggler);
+                    Panel_Editor.Controls.Add(newToggler);
                 }
             }
 
-            columns = (int)numericUpDown1.Value;
-            rows = (int)numericUpDown2.Value;
+            columns = (int)UpDown_GridX.Value;
+            rows = (int)UpDown_GridY.Value;
         }
     }
 }
