@@ -19,6 +19,9 @@ namespace ByteTile
 
         private void Window_Load(object sender, EventArgs e)
         {
+            Panel_GridOptions.Hide();
+            Icon_Loading.Hide();
+
             for (int x = 0; x < 8; x++)
             {
                 for (int y = 0; y < 8; y++)
@@ -28,7 +31,7 @@ namespace ByteTile
                         row = y,
                         column = x
                     };
-                    newToggler.Location = new Point(x * 42, y * 42);
+                    newToggler.Location = new Point(x * 43, y * 43);
                     Panel_Editor.Controls.Add(newToggler);
                 }
             }
@@ -36,6 +39,14 @@ namespace ByteTile
             columns = 8;
         }
         
+        private void Button_GridOptions_Click(object sender, EventArgs e)
+        {
+            if (Panel_GridOptions.Visible)
+                Panel_GridOptions.Hide();
+            else
+                Panel_GridOptions.Show();
+        }
+
         private List<BitToggler> GetBitTogglers()
         {
             List<BitToggler> bitTogglers = new List<BitToggler>();
@@ -57,6 +68,7 @@ namespace ByteTile
                 bt.BackColor = Color.White;
                 bt.isToggled = false;
             }
+            Panel_GridOptions.Hide();
         }
 
         private void InvertGrid_Click(object sender, EventArgs e)
@@ -71,6 +83,7 @@ namespace ByteTile
 
                 bt.isToggled = !bt.isToggled;
             }
+            Panel_GridOptions.Hide();
         }
 
         private void GenerateCode_Click(object sender, EventArgs e)
@@ -96,11 +109,10 @@ namespace ByteTile
                         else
                             binary += "0";
                     }
-                    Console.WriteLine(binary);
                     vals.Add(Convert.ToInt64(binary, 2).ToString());
                 }
 
-                Output.Text += $"uint8_t row{r/8} = "+"{";
+                Output.Text += $"uint8_t row{r/8}[{columns}] = "+"{";
                 foreach (string val in vals)
                 {
                     Output.Text += $"{val}, ";
@@ -113,6 +125,9 @@ namespace ByteTile
 
         private void GenerateGrid_Click(object sender, EventArgs e)
         {
+            Panel_Editor.Hide();
+            Panel_GridOptions.Hide();
+            Icon_Loading.Show();
             Panel_Editor.Controls.Clear();
 
             for (int x = 0; x < UpDown_GridX.Value; x++)
@@ -130,27 +145,81 @@ namespace ByteTile
 
                     if (xmod > ymod)
                     {
-                        newToggler.Location = new Point((x * newToggler.Size.Width) / xmod,
-                                                        (y * newToggler.Size.Width) / xmod);
+                        newToggler.Location = new Point((x * (newToggler.Size.Width + 1) / xmod) + x,
+                                                        (y * (newToggler.Size.Width + 1) / xmod) + y);
 
                         newToggler.Size = new Size(newToggler.Size.Width / xmod,
                                                    newToggler.Size.Width / xmod);
                     }
                     else
                     {
-                        newToggler.Location = new Point((x * newToggler.Size.Width) / ymod,
-                                                        (y * newToggler.Size.Width) / ymod);
+                        newToggler.Location = new Point((x * (newToggler.Size.Width+1) / ymod) + x,
+                                                        (y * (newToggler.Size.Width+1) / ymod) + y);
 
                         newToggler.Size = new Size(newToggler.Size.Width / ymod,
                                                    newToggler.Size.Width / ymod);
                     }
 
                     Panel_Editor.Controls.Add(newToggler);
+                    Icon_Loading.Invalidate();
+                    Icon_Loading.Update();
                 }
             }
+
+            Icon_Loading.Hide();
+            Panel_Editor.Show();
 
             columns = (int)UpDown_GridX.Value;
             rows = (int)UpDown_GridY.Value;
         }
+
+        #region Window Controls
+
+        private bool mouseDown;
+        private Point lastLocation;
+
+        private void Window_ControlBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseDown = true;
+            lastLocation = e.Location;
+        }
+
+        private void Window_ControlBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
+        private void Window_ControlBar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown)
+            {
+                this.Location = new Point((Location.X - lastLocation.X) + e.X,
+                                          (Location.Y - lastLocation.Y) + e.Y);
+                this.Update();
+            }
+        }
+
+        private void Window_Minimize_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void Window_Close_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void Button_MouseEnter(object sender, EventArgs e)
+        {
+            Control bt = (Control)sender;
+            bt.BackColor = Color.FromArgb(40, 45, 55);
+        }
+
+        private void Button_MouseLeave(object sender, EventArgs e)
+        {
+            Control bt = (Control)sender;
+            bt.BackColor = Color.FromArgb(20, 25, 35);
+        }
+        #endregion
     }
 }
